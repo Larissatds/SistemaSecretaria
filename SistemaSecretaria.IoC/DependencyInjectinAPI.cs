@@ -5,6 +5,8 @@ using SistemaSecretaria.Application.Interfaces;
 using SistemaSecretaria.Application.Mappings;
 using SistemaSecretaria.Application.Services;
 using SistemaSecretaria.Data.Context;
+using SistemaSecretaria.Data.Repositories;
+using SistemaSecretaria.Domain.Interfaces;
 
 namespace SistemaSecretaria.IoC
 {
@@ -21,10 +23,12 @@ namespace SistemaSecretaria.IoC
                 b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
             // Injeção de Dependências Repositories
+            services.AddScoped<IAlunoRepository, AlunoRepository>();
 
             // Injeção de Dependências Services
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAlunoService, AlunoService>();
 
             services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 

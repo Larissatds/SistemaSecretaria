@@ -8,6 +8,7 @@ namespace SistemaSecretaria.Data.Context
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Usuario> Usuarios { get; set; } = null!;
         public DbSet<TipoUsuario> TiposUsuario { get; set; } = null!;
+        public DbSet<Aluno> Aluno { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,10 @@ namespace SistemaSecretaria.Data.Context
                 .WithMany(ut => ut.Usuarios)
                 .HasForeignKey(u => u.IdTipoUsuario)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Aluno>()
+              .HasIndex(s => s.CPF)
+              .IsUnique();
 
         }
     }
