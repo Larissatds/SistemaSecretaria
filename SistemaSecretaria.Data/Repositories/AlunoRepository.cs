@@ -22,20 +22,19 @@ namespace SistemaSecretaria.Data.Repositories
         public async Task<Aluno?> GetByCPFOrEmailAsync(string cpf, string email) =>
             await _dbSet.FirstOrDefaultAsync(x => x.CPF.Equals(cpf) || x.Email.Equals(email));
 
-        public async Task<PaginacaoResult<Aluno>> GetAllPagedAsync(PaginacaoRequest request)
+        public async Task<PaginacaoResult<Aluno>> GetAllPagedAsync(PaginacaoRequest request, string? nome)
         {
-            var totalCount = await _dbSet.CountAsync();
             var items = await _dbSet
+                .Where(a => string.IsNullOrEmpty(nome) || a.NomeCompleto.Contains(nome))
                 .OrderBy(s => s.NomeCompleto)
                 .Skip((request.NumeroPagina - 1) * request.TamanhoPagina)
                 .Take(request.TamanhoPagina)
-                .OrderBy(s => s.NomeCompleto)
                 .ToListAsync();
 
             return new PaginacaoResult<Aluno>
             {
                 Items = items,
-                TotalRegistros = totalCount,
+                TotalRegistros = items.Count(),
                 NumeroPagina = request.NumeroPagina,
                 TamanhoPagina = request.TamanhoPagina
             };

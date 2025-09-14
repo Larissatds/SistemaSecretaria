@@ -1,11 +1,7 @@
-﻿using System.Net.Mail;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 using SistemaSecretaria.Application.DTOs;
 using SistemaSecretaria.Application.Interfaces;
-using SistemaSecretaria.Data.Repositories;
 using SistemaSecretaria.Domain.Entities;
 using SistemaSecretaria.Domain.Interfaces;
 
@@ -23,9 +19,9 @@ namespace SistemaSecretaria.Application.Services
             _hasher = new PasswordHasher<Aluno>();
         }
 
-        public async Task<PaginacaoResult<AlunoDTO>> GetAllPagedAsync(PaginacaoRequest request)
+        public async Task<PaginacaoResult<AlunoDTO>> GetAllPagedAsync(PaginacaoRequest request, string? nome)
         {
-            var result = await _repository.GetAllPagedAsync(request);
+            var result = await _repository.GetAllPagedAsync(request, nome);
 
             return new PaginacaoResult<AlunoDTO>
             {
@@ -36,7 +32,7 @@ namespace SistemaSecretaria.Application.Services
                     CPF = x.CPF,
                     DataNascimento = x.DataNascimento,
                     Email = x.Email,
-                    SenhaHash = x.SenhaHash
+                    Senha = x.SenhaHash
                 }),
                 TotalRegistros = result.TotalRegistros,
                 NumeroPagina = result.NumeroPagina,
@@ -50,7 +46,7 @@ namespace SistemaSecretaria.Application.Services
             var valido = await this.Validations(dto, false);
 
             // Hash da senha
-            var senha = _hasher.HashPassword(null, dto.SenhaHash);
+            var senha = _hasher.HashPassword(null, dto.Senha);
 
             // Preenche o objeto Aluno e registra na base de dados
             var aluno = new Aluno
@@ -65,7 +61,7 @@ namespace SistemaSecretaria.Application.Services
             await _repository.AddAsync(aluno);
 
             dto.IdAluno = aluno.IdAluno;
-            dto.SenhaHash = senha;
+            dto.Senha= senha;
 
             return dto;
         }
@@ -76,7 +72,7 @@ namespace SistemaSecretaria.Application.Services
             var valido = await this.Validations(dto, true);
 
             // Hash da senha
-            var senha = _hasher.HashPassword(null, dto.SenhaHash);
+            var senha = _hasher.HashPassword(null, dto.Senha);
 
             // Preenche o objeto Aluno e registra na base de dados
             valido.aluno.NomeCompleto = dto.NomeCompleto;
@@ -85,7 +81,7 @@ namespace SistemaSecretaria.Application.Services
             valido.aluno.Email = dto.Email;
             valido.aluno.SenhaHash = senha;
 
-            dto.SenhaHash = senha;
+            dto.Senha = senha;
 
             await _repository.UpdateAsync(valido.aluno);
 
@@ -108,7 +104,7 @@ namespace SistemaSecretaria.Application.Services
             if (string.IsNullOrWhiteSpace(dto.CPF))
                 throw new ArgumentException("O CPF informado é inválido.");
 
-            var alunoCadastrado = await _repository.GetByCPFOrEmailAsync(dto.CPF, dto.CPF);
+            var alunoCadastrado = await _repository.GetByCPFOrEmailAsync(dto.CPF, dto.Email);
 
             if (alunoCadastrado != null || alunoCadastrado?.IdAluno > 0)
                 throw new ArgumentException("Já existe um aluno cadastrado com o CPF ou Email informado.");
@@ -119,7 +115,7 @@ namespace SistemaSecretaria.Application.Services
             if (cpf.Length != 11)
                 throw new ArgumentException("O CPF informado é inválido.");
 
-            // Validações de CPF e Email
+            // Validações de CPF, Email e Senha
             var cpfValido = this.ValidateCPF(cpf);
             if (!cpfValido)
                 throw new ArgumentException("O CPF informado é inválido.");
@@ -127,6 +123,10 @@ namespace SistemaSecretaria.Application.Services
             var emailValido = this.ValidateEmail(dto.Email);
             if (!emailValido)
                 throw new ArgumentException("O email informado é inválido.");
+
+            var senhaValida = this.ValidatePassword(dto.Senha);
+            if (!senhaValida)
+                throw new ArgumentException("A senha informada é inválida.");
 
             if (isUpdate)
             {
@@ -191,6 +191,41 @@ namespace SistemaSecretaria.Application.Services
                     RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                 return regex.IsMatch(email);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool ValidatePassword(string senha)
+        {
+            if (string.IsNullOrWhiteSpace(senha))
+                return false;
+
+            try
+            {
+                // Pelo menos 8 caracteres
+                if (senha.Length < 8)
+                    return false;
+
+                // Contém pelo menos uma letra maiúscula
+                if (!Regex.IsMatch(senha, "[A-Z]"))
+                    return false;
+
+                // Contém pelo menos uma letra minúscula
+                if (!Regex.IsMatch(senha, "[a-z]"))
+                    return false;
+
+                // Contém pelo menos um número
+                if (!Regex.IsMatch(senha, "[0-9]"))
+                    return false;
+
+                // Contém pelo menos um símbolo especial
+                if (!Regex.IsMatch(senha, @"[\W_]"))
+                    return false;
+
+                return true;
             }
             catch
             {

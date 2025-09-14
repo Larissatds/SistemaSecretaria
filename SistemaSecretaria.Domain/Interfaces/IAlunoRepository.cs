@@ -6,7 +6,7 @@ namespace SistemaSecretaria.Domain.Interfaces
     {
         Task<Aluno?> GetByIdAsync(decimal id);
         Task<Aluno?> GetByCPFOrEmailAsync(string cpf, string email);
-        Task<PaginacaoResult<Aluno>> GetAllPagedAsync(PaginacaoRequest request);
+        Task<PaginacaoResult<Aluno>> GetAllPagedAsync(PaginacaoRequest request, string? nome);
         Task AddAsync(Aluno entity);
         Task UpdateAsync(Aluno entity);
         Task DeleteAsync(Aluno entity);

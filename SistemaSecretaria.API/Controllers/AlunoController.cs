@@ -13,19 +13,19 @@ namespace SistemaSecretaria.API.Controllers
     {
         private readonly IAlunoService _alunoService;
 
-        public AlunoController(IAlunoService studentService)
+        public AlunoController(IAlunoService alunoService)
         {
-            _alunoService = studentService;
+            _alunoService = alunoService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPaged([FromQuery] int numeroPagina = 1, int tamanhoPagina = 10)
+        public async Task<IActionResult> GetAllPaged([FromBody] AlunoRequest aluno)
         {
             var result = await _alunoService.GetAllPagedAsync(new PaginacaoRequest
             {
-                NumeroPagina = numeroPagina,
-                TamanhoPagina = tamanhoPagina
-            });
+                NumeroPagina = aluno.NumeroPagina,
+                TamanhoPagina = aluno.TamanhoPagina
+            }, aluno.Nome);
 
             return Ok(result);
         }
@@ -51,7 +51,7 @@ namespace SistemaSecretaria.API.Controllers
         {
             var success = await _alunoService.DeleteAsync(alunoId);
             if (!success) return NotFound();
-            return Ok("Aluno removido com suucesso!");
+            return Ok("Aluno removido com sucesso!");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SistemaSecretaria.Domain.Entities;
 
 namespace SistemaSecretaria.Application.DTOs
 {
@@ -18,6 +19,11 @@ namespace SistemaSecretaria.Application.DTOs
         public string Email { get; set; }
 
         [Required]
-        public string SenhaHash { get; set; }
+        public string Senha { get; set; }
+    }
+
+    public class AlunoRequest : PaginacaoRequest
+    {
+        public string Nome { get; set; }
     }
 }
