@@ -24,11 +24,14 @@ namespace SistemaSecretaria.IoC
 
             // Injeção de Dependências Repositories
             services.AddScoped<IAlunoRepository, AlunoRepository>();
+            services.AddScoped<ITurmaRepository, TurmaRepository>();
+            services.AddScoped<IMatriculaRepository, MatriculaRepository>();
 
             // Injeção de Dependências Services
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAlunoService, AlunoService>();
+            services.AddScoped<ITurmaService, TurmaService>();
 
             services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 

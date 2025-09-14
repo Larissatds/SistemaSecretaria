@@ -9,6 +9,8 @@ namespace SistemaSecretaria.Data.Context
         public DbSet<Usuario> Usuarios { get; set; } = null!;
         public DbSet<TipoUsuario> TiposUsuario { get; set; } = null!;
         public DbSet<Aluno> Aluno { get; set; } = null!;
+        public DbSet<Turma> Turma { get; set; } = null!;
+        public DbSet<Matricula> Matricula { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +29,9 @@ namespace SistemaSecretaria.Data.Context
             modelBuilder.Entity<Aluno>()
               .HasIndex(s => s.CPF)
               .IsUnique();
+
+            modelBuilder.Entity<Turma>()
+              .HasIndex(s => s.IdTurma);
 
         }
     }
