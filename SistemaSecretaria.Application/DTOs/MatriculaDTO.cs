@@ -13,7 +13,6 @@ namespace SistemaSecretaria.Application.DTOs
         [Required]
         public decimal IdTurma { get; set; }
 
-        [Required]
         public DateTime DataMatricula { get; set; }
 
         [Required]
