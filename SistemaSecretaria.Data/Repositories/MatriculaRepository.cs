@@ -17,14 +17,39 @@ namespace SistemaSecretaria.Data.Repositories
             _dbSet = context.Set<Matricula>();
         }
 
-        //public async Task<Matricula?> GetByIdAsync(decimal id) =>
-        //    await _dbSet.FindAsync(id);
-
-        public async Task<PaginacaoResult<Matricula>> GetByTurmaAsync(decimal turmaId, PaginacaoRequest request)
+        public async Task<PaginacaoResult<Matricula>> GetByTurmaAndAlunoAsync(decimal? turmaId, decimal? alunoId, PaginacaoRequest request)
         {
-            var totalCount = await _dbSet.CountAsync();
             var items = await _dbSet
-                .Where(x => x.IdTurma == turmaId)
+                .Where(x => (turmaId == null ||x.IdTurma == turmaId) && (alunoId == null || x.IdAluno == alunoId))
+                .Include(m => m.Turma)
+                    .ThenInclude(t => t.Matriculas)
+                    .ThenInclude(mt => mt.Aluno)
+                .Include(m => m.Aluno)
+                .Select(x => new Matricula
+                {
+                    IdMatricula = x.IdMatricula,
+                    IdAluno = x.IdAluno,
+                    IdTurma = x.IdTurma,
+                    DataMatricula = x.DataMatricula,
+                    Status = x.Status,
+                    Aluno = new Aluno
+                    {
+                        IdAluno = x.Aluno.IdAluno,
+                        NomeCompleto = x.Aluno.NomeCompleto
+                    },
+                    Turma = new Turma
+                    {
+                        IdTurma = x.Turma.IdTurma,
+                        Nome = x.Turma.Nome,
+                        Alunos = x.Turma.Matriculas
+                        .Select(a => new Aluno
+                        {
+                            IdAluno = a.Aluno.IdAluno,
+                            NomeCompleto = a.Aluno.NomeCompleto
+                        })
+                        .ToList()
+                    }
+                })
                 .OrderBy(s => s.IdMatricula)
                 .Skip((request.NumeroPagina - 1) * request.TamanhoPagina)
                 .Take(request.TamanhoPagina)
@@ -33,29 +58,11 @@ namespace SistemaSecretaria.Data.Repositories
             return new PaginacaoResult<Matricula>
             {
                 Items = items,
-                TotalRegistros = totalCount,
+                TotalRegistros = items.Count,
                 NumeroPagina = request.NumeroPagina,
                 TamanhoPagina = request.TamanhoPagina
             };
 
-        }
-
-        public async Task<PaginacaoResult<Matricula>> GetAllPagedAsync(PaginacaoRequest request)
-        {
-            var totalCount = await _dbSet.CountAsync();
-            var items = await _dbSet
-                .OrderBy(s => s.IdMatricula)
-                .Skip((request.NumeroPagina - 1) * request.TamanhoPagina)
-                .Take(request.TamanhoPagina)
-                .ToListAsync();
-
-            return new PaginacaoResult<Matricula>
-            {
-                Items = items,
-                TotalRegistros = totalCount,
-                NumeroPagina = request.NumeroPagina,
-                TamanhoPagina = request.TamanhoPagina
-            };
         }
 
         public async Task AddAsync(Matricula entity)

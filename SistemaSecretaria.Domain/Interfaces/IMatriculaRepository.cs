@@ -4,8 +4,7 @@ namespace SistemaSecretaria.Domain.Interfaces
 {
     public interface IMatriculaRepository
     {
-        Task<PaginacaoResult<Matricula>> GetByTurmaAsync(decimal turmaId, PaginacaoRequest request);
-        Task<PaginacaoResult<Matricula>> GetAllPagedAsync(PaginacaoRequest request);
+        Task<PaginacaoResult<Matricula>> GetByTurmaAndAlunoAsync(decimal? turmaId, decimal? alunoId, PaginacaoRequest request);
         Task AddAsync(Matricula entity);
     }
 }

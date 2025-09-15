@@ -32,6 +32,7 @@ namespace SistemaSecretaria.IoC
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAlunoService, AlunoService>();
             services.AddScoped<ITurmaService, TurmaService>();
+            services.AddScoped<IMatriculaService, MatriculaService>();
 
             services.AddAutoMapper(typeof(DomainToDTOMappingProfile));
 

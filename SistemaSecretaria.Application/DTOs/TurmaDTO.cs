@@ -14,6 +14,6 @@ namespace SistemaSecretaria.Application.DTOs
 
         public decimal? TotalAlunos { get; set; }
 
-        public List<Matricula> Matriculas { get; set; } = new List<Matricula>();
+        public List<Aluno> Alunos { get; set; } = new List<Aluno>();
     }
 }

@@ -23,7 +23,7 @@ namespace SistemaSecretaria.Application.Services
 
             foreach (var matricula in result.Items)
             {
-                var matriculaResult = await _matriculaRepository.GetByTurmaAsync(matricula.IdTurma, new PaginacaoRequest { TamanhoPagina = int.MaxValue });
+                var matriculaResult = await _matriculaRepository.GetByTurmaAndAlunoAsync(matricula.IdTurma, null, new PaginacaoRequest { TamanhoPagina = int.MaxValue });
                 matriculas.AddRange(matriculaResult.Items);
             }
 
@@ -98,7 +98,7 @@ namespace SistemaSecretaria.Application.Services
             {
                 var turma = await _repository.GetByIdAsync(dto.IdTurma.Value);
                 if (turma == null)
-                    throw new ArgumentNullException("A entidade aluno é inválida.");
+                    throw new ArgumentNullException("A entidade turma é inválida.");
 
                 return (turma, true);
             }

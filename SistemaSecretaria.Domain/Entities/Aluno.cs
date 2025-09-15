@@ -33,5 +33,9 @@ namespace SistemaSecretaria.Domain.Entities
         [Required]
         [Column("SENHA_HASH")]
         public string SenhaHash { get; set; }
+
+        [NotMapped]
+        public List<Matricula> Matriculas { get; set; } = new List<Matricula>();
+
     }
 }

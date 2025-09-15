@@ -18,5 +18,12 @@ namespace SistemaSecretaria.Domain.Entities
 
         [Column("DESCRICAO")]
         public string Descricao { get; set; }
+
+        [NotMapped]
+        public List<Matricula> Matriculas { get; set; } = new List<Matricula>();
+
+        [NotMapped]
+        public List<Aluno> Alunos { get; set; } = new List<Aluno>();
+
     }
 }

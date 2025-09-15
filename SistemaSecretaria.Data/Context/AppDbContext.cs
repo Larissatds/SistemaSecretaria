@@ -33,6 +33,21 @@ namespace SistemaSecretaria.Data.Context
             modelBuilder.Entity<Turma>()
               .HasIndex(s => s.IdTurma);
 
+            modelBuilder.Entity<Matricula>(entity =>
+            {
+                entity.HasKey(m => m.IdMatricula);
+
+                entity.HasOne(m => m.Aluno)
+                      .WithMany(a => a.Matriculas)
+                      .HasForeignKey(m => m.IdAluno)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.Turma)
+                      .WithMany(t => t.Matriculas)
+                      .HasForeignKey(m => m.IdTurma)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
         }
     }
 }
